@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>邮件信息</title>
+</head>
+<body>
+    <div id="app">
+        <form @submit.prevent="login">
+            <label for="username">Username:</label>
+            <input type="text" id="username" v-model="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" v-model="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div v-if="loggedIn">
+            <h2>邮件列表</h2>
+            <ul>
+                <li v-for="(email, index) in emails" :key="index">
+                    <h3>{{ email.subject }}</h3>
+                    <p>寄件人: {{ email.from }}</p>
+                    <div class="email-content" :style="{ height: contentHeight + 'px' }">
+                    <div v-html="email.content" class="email-content-inner"></div>
+                    </div>
+                </li>
+            </ul>
+            <!--<h2>Emails</h2>
+            <select v-model="selectedCategory">
+                <option  :value="success">{{ success }}</option>
+                <option v-for="email in emails" :value="email.from"></option>
+            </select>
+            <ul v-if="selectedCategory">
+                <li v-for="email in emails" :key="email.id">
+                    <div>{{ email.subject }}</div>
+                    <div v-html="email.content"></div>
+                </li>
+            </ul>-->
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                username: '',
+                password: '',
+                loggedIn: false,
+                emails: {
+                    from: '',
+                    subject: '',
+                    content: ''
+                },
+                categories: [],
+                selectedCategory: null,
+                success: '',
+                contentHeight: 0,
+                ws: null
+            },
+            methods: {
+                login() {
+                    // Send login credentials to the server
+                    // Assuming server endpoint is /email/get
+                    axios.post('/email', {
+                            username: this.username,
+                            password: this.password
+                    })
+                        .then(response => {
+                            const data = response.data;
+                            this.emails = data;
+                            // this.emails = data.from;
+                            // this.categories = data.categories;
+                            this.loggedIn = true;
+                            // 设置内容高度为视图窗口高度的 1/4
+                            this.contentHeight = window.innerHeight / 4;
+                        })
+                        .catch(error => {
+                            console.error('Error logging in:', error);
+                        });
+                }
+            }
+        });
+    </script>
+    <style scoped>
+        .email-content {
+            width: 50%; /* 设置 div 宽度为视图窗口宽度的一半 */
+            margin: auto; /* 水平居中 */
+            overflow-y: auto; /* 垂直方向超出内容时显示滚动条 */
+            border: 1px solid #ccc; /* 添加边框 */
+            padding: 10px; /* 添加内边距 */
+            float: none; /* 取消浮动 */
+        }
+
+        .email-content-inner {
+            float: none; /* 取消浮动 */
+        }
+    </style>
+</body>
+
+</html>
