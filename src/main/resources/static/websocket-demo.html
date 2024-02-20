@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Demo</title>
+</head>
+<body>
+<input type="text" id="username" placeholder="账号">
+<input type="password" id="password" placeholder="密码">
+<button onclick="sendMessage()">发送</button>
+<button onclick="closeConnection()">断开连接</button>
+<div id="messageContainer"></div>
+
+<script>
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const messageContainer = document.getElementById('messageContainer');
+
+    let socket;
+
+    // 发送消息给后端
+    function sendMessage() {
+        // 如果 WebSocket 连接不存在，则建立连接
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            socket = new WebSocket('ws://localhost:8080/custom-websocket');
+            // 连接建立时发送账号密码信息
+            socket.onopen = function(event) {
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+                const userPo = {
+                    username: username,
+                    password: password
+                };
+                socket.send(JSON.stringify(userPo));
+            };
+            // 接收并处理后端发送的消息
+            socket.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                console.log(message.type);
+                if (message.type === 'heartbeat') {
+                    messageContainer.innerHTML += '收到心跳信息: ' + message.heartbeat + '<br>';
+                } else if (message.type === 'user_info') {
+                    messageContainer.innerHTML += '收到用户信息: ' + JSON.stringify(message.user_info) + '<br>';
+                }
+                if (message.topic === 'topicName') {
+                    messageContainer.innerHTML += '收到主题为 topicName 的消息: ' + message.content + '<br>';
+                }
+            };
+        } else { // 如果 WebSocket 连接已存在，则直接发送消息
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            const userPo = {
+                username: username,
+                password: password
+            };
+            socket.send(JSON.stringify(userPo));
+        }
+    }
+
+    // 断开 WebSocket 连接
+    function closeConnection() {
+        if (socket) {
+            socket.close();
+            socket = null;
+            messageContainer.innerHTML += 'WebSocket 连接已断开<br>';
+        }
+    }
+    // 连接建立时向指定主题订阅
+    socket.onopen = function(event) {
+        subscribeToTopic("topicName");
+    };
+
+    // 订阅指定主题
+    function subscribeToTopic(topic) {
+        socket.send(JSON.stringify({
+            type: 'subscribe',
+            topic: topic
+        }));
+    }
+
+    /*// 建立 WebSocket 连接
+    const socket = new WebSocket('ws://localhost:8080/custom-websocket');
+
+    // 连接建立时发送账号密码信息
+    socket.onopen = function(event) {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const userPo = {
+            username: username,
+            password: password
+        };
+        socket.send(JSON.stringify(userPo));
+    };
+
+    // 接收并处理后端发送的消息
+    socket.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        console.log(message.type);
+        if (message.type === 'heartbeat') {
+            messageContainer.innerHTML += '收到心跳信息: ' + event.data + '<br>';
+        } else if (message.type === 'user_info') {
+            messageContainer.innerHTML += '收到用户信息: ' + JSON.stringify(message.content) + '<br>';
+        }
+    };
+
+    // 发送消息给后端
+    function sendMessage() {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const userPo = {
+            username: username,
+            password: password
+        };
+        socket.send(JSON.stringify(userPo));
+    }*/
+</script>
+</body>
+</html>

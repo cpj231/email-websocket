@@ -58,6 +58,7 @@ public class MailConfig {
     public static void main(String[] args) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         System.out.println(mailSender.getJavaMailProperties().toString());
+        System.out.println(27/2);
     }
 
 }

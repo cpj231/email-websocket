@@ -10,14 +10,14 @@ import java.util.Properties;
 public class SendMail {
     public static void test() {
         // 收件人邮箱地址
-        String to = "panjie_chen@163.com";
+        String to = "123@163.com";
 
         // 发件人邮箱地址
-        String from = "2317613629@qq.com";
+        String from = "123@qq.com";
 
         // 设置发件人的用户名和密码
-        String username = "2317613629@qq.com";
-        String password = "wyunxiygzyhedigd";
+        String username = "123@qq.com";
+        String password = "123";
         // SMTP服务器地址
         String host = "smtp.qq.com";
 

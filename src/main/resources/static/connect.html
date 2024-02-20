@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email System</title>
+</head>
+<body>
+<div id="app">
+    <div v-if="!loggedIn">
+        <input type="text" v-model="username" placeholder="Username">
+        <input type="password" v-model="password" placeholder="Password">
+        <button @click="login">Login</button>
+    </div>
+    <div v-else>
+        <div v-for="email in emails" :key="email.id">
+            <div class="header" @click="toggleEmail(email)">
+                <h2>{{ email.subject }}</h2>
+            </div>
+            <div class="content" v-if="email.opened">
+                <p>{{ email.content }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
